@@ -57,6 +57,7 @@ def create_db():
     conn.commit()
     conn.close()
 
+
 # Middleware to check session timeout
 @app.before_request
 def before_request():
@@ -222,8 +223,69 @@ def edit(id):
         return redirect(url_for('dashboard'))
 
     return render_template('edit.html', software_entry=software_entry)
+def calculate_compliance(software_spend):
+    # Example function to calculate compliance (replace with your logic)
+    if software_spend > 50000:
+        return 80  # Example compliance percentage
+    else:
+        return 50  # Example compliance percentage
 
-# Route for savings tracker
+@app.route('/reports')
+def reports_dashboard():
+    conn = sqlite3.connect('SAMdashboard.db')
+    c = conn.cursor()
+
+    # Fetch all software entries from the database
+    c.execute('SELECT * FROM software_data')
+    software_entries = c.fetchall()
+
+    # Calculate total software spend
+    total_spend = sum(float(entry[4]) for entry in software_entries)  # Assuming software_spend is at index 4 in the tuple
+
+    # Initialize variables to calculate average compliance
+    total_compliance = 0
+    num_entries = len(software_entries)
+
+    # Calculate compliance for each software entry and accumulate total compliance
+    for entry in software_entries:
+        software_spend = float(entry[4])  # Assuming software_spend is at index 4 in the tuple
+        compliance = calculate_compliance(software_spend)
+        total_compliance += compliance
+
+    # Calculate average compliance
+    if num_entries > 0:
+        average_compliance = total_compliance / num_entries
+    else:
+        average_compliance = 0  # Default to 0 if there are no entries
+
+    # Format the average_compliance to two decimal places
+    average_compliance_formatted = '{:.2f}'.format(average_compliance)
+
+    # Initialize a list to store software entries with added compliance
+    formatted_entries = []
+
+    # Calculate compliance for each software entry and format the entries
+    for entry in software_entries:
+        software_spend = float(entry[4])  # Assuming software_spend is at index 4 in the tuple
+        compliance = calculate_compliance(software_spend)
+
+        # Create a dictionary to store entry data and compliance
+        formatted_entry = {
+            'id': entry[0],               # Assuming id is at index 0 in the tuple
+            'software_name': entry[1],     # Assuming software_name is at index 1 in the tuple
+            'primary_contact': entry[2],   # Assuming primary_contact is at index 2 in the tuple
+            'req_number': entry[3],        # Assuming req_number is at index 3 in the tuple
+            'software_spend': software_spend,
+            'compliance': compliance
+        }
+
+        formatted_entries.append(formatted_entry)
+
+    conn.close()
+
+    return render_template('reports_dashboard.html', software_entries=formatted_entries, total_spend=total_spend, average_compliance=average_compliance_formatted)
+
+    # Route for savings tracker
 @app.route('/savings_tracker', methods=['GET', 'POST'])
 def savings_tracker():
     if 'user_id' not in session:
@@ -280,8 +342,11 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Call init_db function to initialize software catalog database
-init_db()
+# Function to get a database connection
+def get_db_connection():
+    conn = sqlite3.connect('SAMdashboard.db')
+    conn.row_factory = sqlite3.Row
+    return conn
 
 # Route to render the catalog page with entries and search form
 @app.route('/catalog', methods=['GET', 'POST'])
@@ -303,8 +368,79 @@ def catalog():
     # Render the template with catalog_entries
     return render_template('catalog.html', catalog_entries=catalog_entries)
 
+# Route to handle adding new entries
+@app.route('/add_entry', methods=['POST'])
+def add_entry():
+    conn = get_db_connection()
+
+    # Extract data from the form submission
+    user_name = request.form['user_name']
+    software_name = request.form['software_name']
+    assigned_date = request.form['assigned_date']
+    sr_number = request.form['sr_number']
+
+    # Insert new entry into the database
+    conn.execute('INSERT INTO software_catalog (user_name, software_name, assigned_date, sr_number) VALUES (?, ?, ?, ?)',
+                 (user_name, software_name, assigned_date, sr_number))
+    conn.commit()
+    conn.close()
+
+    # Redirect to the catalog page to see the updated entries
+    return redirect(url_for('catalog'))
+
 # Ensure the database and tables are created when the script runs
-create_db()
+init_db()
+
+@app.route('/procurement', methods=['GET', 'POST'])
+def procurement():
+    if request.method == 'POST':
+        # Process form submission
+        software_name = request.form['softwareName']
+        vendor = request.form['vendor']
+        estimated_cost = request.form['estimatedCost']
+        purpose = request.form['purpose']
+        approval_status = 'Pending'  # Default status
+
+        # Store procurement request in database
+        conn = sqlite3.connect('SAMdashboard.db')
+        cursor = conn.cursor()
+        cursor.execute('INSERT INTO procurement (software_name, vendor, estimated_cost, purpose, approval_status) VALUES (?, ?, ?, ?, ?)',
+                       (software_name, vendor, estimated_cost, purpose, approval_status))
+        conn.commit()
+        conn.close()
+
+        # Redirect to procurement page to avoid form resubmission on refresh
+        return redirect(url_for('procurement'))
+
+    # Fetch all procurement entries from database
+    conn = sqlite3.connect('SAMdashboard.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM procurement ORDER BY id DESC')  # Fetch entries ordered by latest first
+    entries = cursor.fetchall()
+    conn.close()
+
+    # Render procurement form and display all entries
+    return render_template('procurement.html', entries=entries)
+
+# Route to handle approval and rejection actions
+@app.route('/process_approval/<int:id>/<action>')
+def process_approval(id, action):
+    # Update approval status in database based on action (approve or reject)
+    if action == 'approve':
+        approval_status = 'Approved'
+    elif action == 'reject':
+        approval_status = 'Rejected'
+    else:
+        return 'Invalid action'
+
+    conn = sqlite3.connect('SAMdashboard.db')
+    cursor = conn.cursor()
+    cursor.execute('UPDATE procurement SET approval_status = ? WHERE id = ?', (approval_status, id))
+    conn.commit()
+    conn.close()
+
+    # Redirect back to procurement page after approval/rejection
+    return redirect(url_for('procurement'))
 
 # Run the Flask application
 if __name__ == '__main__':
