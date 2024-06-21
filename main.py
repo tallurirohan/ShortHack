@@ -143,6 +143,7 @@ def dashboard():
     conn.close()
     return render_template('dashboard.html', software_entries=software_entries)
 
+
 # Route to submit software entry
 @app.route('/logout')
 def logout():
@@ -159,6 +160,7 @@ def submit():
     primary_contact = request.form['primary_contact']
     req_number = request.form['req_number']
     software_spend = request.form['software_spend']
+    contract_id = request.form['contract_id']  # New field for contract ID
     file = request.files['contract_file']
 
     # Save uploaded file
@@ -173,12 +175,13 @@ def submit():
     conn = sqlite3.connect('SAMdashboard.db')
     c = conn.cursor()
     c.execute(
-        'INSERT INTO software_data (software_name, primary_contact, req_number, software_spend, contract_file_path) VALUES (?, ?, ?, ?, ?)',
-        (software_name, primary_contact, req_number, software_spend, file_path))
+        'INSERT INTO software_data (software_name, primary_contact, req_number, software_spend, contract_file_path, contract_id) VALUES (?, ?, ?, ?, ?, ?)',
+        (software_name, primary_contact, req_number, software_spend, file_path, contract_id))
     conn.commit()
     conn.close()
     flash('Software entry added successfully!', 'success')
     return redirect(url_for('dashboard'))
+
 
 # Route to handle uploaded files
 @app.route('/uploads/<filename>')
@@ -203,6 +206,7 @@ def edit(id):
         primary_contact = request.form['primary_contact']
         req_number = request.form['req_number']
         software_spend = request.form['software_spend']
+        contract_id = request.form['contract_id']  # New field for contract ID
         file = request.files['contract_file']
 
         # Update entry in database
@@ -212,17 +216,18 @@ def edit(id):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            c.execute('UPDATE software_data SET software_name=?, primary_contact=?, req_number=?, software_spend=?, contract_file_path=? WHERE id=?',
-                      (software_name, primary_contact, req_number, software_spend, file_path, id))
+            c.execute('UPDATE software_data SET software_name=?, primary_contact=?, req_number=?, software_spend=?, contract_file_path=?, contract_id=? WHERE id=?',
+                      (software_name, primary_contact, req_number, software_spend, file_path, contract_id, id))
         else:
-            c.execute('UPDATE software_data SET software_name=?, primary_contact=?, req_number=?, software_spend=? WHERE id=?',
-                      (software_name, primary_contact, req_number, software_spend, id))
+            c.execute('UPDATE software_data SET software_name=?, primary_contact=?, req_number=?, software_spend=?, contract_id=? WHERE id=?',
+                      (software_name, primary_contact, req_number, software_spend, contract_id, id))
         conn.commit()
         conn.close()
         flash('Software entry updated successfully!', 'success')
         return redirect(url_for('dashboard'))
 
     return render_template('edit.html', software_entry=software_entry)
+
 def calculate_compliance(software_spend):
     # Example function to calculate compliance (replace with your logic)
     if software_spend > 50000:
