@@ -11,21 +11,23 @@
             background-color: #e0f7fa;
             margin: 0;
             padding: 20px;
+            animation: slide-in 0.5s ease-out;
         }
         .top-panel {
-            background-color: #ff6f00; /* Orange color */
+            background-color: #ff6f00;
             color: white;
-            padding: 8px 12px; /* Adjusted padding */
+            padding: 8px 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-top-left-radius: 8px; /* Rounded corners, top left */
-            border-top-right-radius: 8px; /* Rounded corners, top right */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
+            animation: slide-in 0.5s ease-out; /* Apply sliding animation */
         }
         .top-panel .panel-title {
-            font-size: 18px; /* Same font size */
+            font-size: 18px;
             margin: 0;
         }
         .top-panel .menu {
@@ -33,19 +35,19 @@
             margin: 0;
             padding: 0;
             display: flex;
-            align-items: center; /* Align menu items vertically centered */
+            align-items: center;
         }
         .top-panel .menu li {
-            margin-left: 20px; /* Adjust spacing between menu items */
+            margin-left: 20px;
         }
         .top-panel .menu li:first-child {
-            margin-left: 0; /* Remove margin for the first item */
+            margin-left: 0;
         }
         .top-panel .menu li a {
             text-decoration: none;
             color: white;
             font-weight: bold;
-            font-size: 14px; /* Adjusted font size */
+            font-size: 14px;
             transition: 0.3s;
         }
         .top-panel .menu li a:hover {
@@ -57,10 +59,12 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             padding: 20px;
             margin-bottom: 20px;
+            animation: slide-in 0.5s ease-out; /* Apply sliding animation */
         }
         .form-container {
             max-width: 600px;
             margin: 0 auto;
+            animation: slide-in 0.5s ease-out; /* Apply sliding animation */
         }
         .form-container label {
             font-weight: bold;
@@ -79,55 +83,66 @@
             margin-top: 10px;
         }
         .form-container input[type="submit"] {
-            background-color: #ff6f00; /* Orange color */
+            background-color: #ff6f00;
             color: white;
             border: none;
             padding: 12px 20px;
             text-decoration: none;
-            font-size: 14px; /* Same font size */
+            font-size: 14px;
             cursor: pointer;
             border-radius: 4px;
             transition: background-color 0.3s;
         }
         .form-container input[type="submit"]:hover {
-            background-color: #e65100; /* Darker orange on hover */
+            background-color: #e65100;
         }
         .software-entry {
             background-color: #f9f9f9;
             border: 1px solid #ddd;
             padding: 10px;
             margin-bottom: 10px;
+            animation: slide-in 0.5s ease-out; /* Apply sliding animation */
         }
         .software-entry p {
             margin: 5px 0;
         }
         .software-entry a {
-            color: #007bff; /* Blue color */
+            color: #007bff;
             text-decoration: none;
             margin-left: 10px;
         }
         .edit-button {
-            background-color: #ff6f00; /* Orange color */
+            background-color: #ff6f00;
             color: white;
             border: none;
             padding: 6px 12px;
             text-decoration: none;
-            font-size: 12px; /* Adjusted font size */
+            font-size: 12px;
             cursor: pointer;
             border-radius: 4px;
         }
         .edit-button:hover {
-            background-color: #e65100; /* Darker orange on hover */
+            background-color: #e65100;
         }
         h1 {
-            color: #ffffff; /* White color */
+            color: #ffffff;
             text-align: left;
-            margin-top: 0; /* Remove default margin */
+            margin-top: 0;
             margin-bottom: 20px;
-            border-bottom: 2px solid #ffffff; /* White underline */
+            border-bottom: 2px solid #ffffff;
             padding-bottom: 10px;
-            display: inline-block; /* Ensures border doesn't span full width */
-            font-size: 24px; /* Adjusted font size */
+            display: inline-block;
+            font-size: 24px;
+        }
+        @keyframes slide-in {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
@@ -150,7 +165,7 @@
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title mb-4">Software Procurement Request Form</h5>
-                <form id="procurementForm" method="POST">
+                <form id="procurementForm" method="POST" class="form-container">
                     <div class="mb-3">
                         <label for="softwareName" class="form-label">Software Name:</label>
                         <input type="text" class="form-control" id="softwareName" name="softwareName" required>
@@ -178,22 +193,22 @@
                 <h5 class="card-title mb-4">All Procurement Entries</h5>
                 <ul class="list-group">
                     {% for entry in entries %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">{{ entry[1] }}</h6>
+                    <li class="list-group-item">
+                        <div class="software-entry">
+                            <h6>{{ entry[1] }}</h6>
                             <small>{{ entry[2] }} | ${{ entry[3] }}</small>
-                            <p class="mb-0">{{ entry[4] }}</p>
-                        </div>
-                        <div>
-                            {% if entry[5] == 'Pending' %}
-                            <span class="badge bg-secondary">{{ entry[5] }}</span>
-                            <a href="{{ url_for('process_approval', id=entry[0], action='approve') }}" class="btn btn-success ms-2">Approve</a>
-                            <a href="{{ url_for('process_approval', id=entry[0], action='reject') }}" class="btn btn-danger ms-2">Reject</a>
-                            {% elif entry[5] == 'Approved' %}
-                            <span class="badge bg-success">{{ entry[5] }}</span>
-                            {% else %}
-                            <span class="badge bg-danger">{{ entry[5] }}</span>
-                            {% endif %}
+                            <p>{{ entry[4] }}</p>
+                            <div>
+                                {% if entry[5] == 'Pending' %}
+                                <span class="badge bg-secondary">{{ entry[5] }}</span>
+                                <a href="{{ url_for('process_approval', id=entry[0], action='approve') }}" class="btn btn-success ms-2">Approve</a>
+                                <a href="{{ url_for('process_approval', id=entry[0], action='reject') }}" class="btn btn-danger ms-2">Reject</a>
+                                {% elif entry[5] == 'Approved' %}
+                                <span class="badge bg-success">{{ entry[5] }}</span>
+                                {% else %}
+                                <span class="badge bg-danger">{{ entry[5] }}</span>
+                                {% endif %}
+                            </div>
                         </div>
                     </li>
                     {% endfor %}
