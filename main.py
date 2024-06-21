@@ -4,6 +4,9 @@ import sqlite3
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
+import pandas as pd
+from flask import request, flash, redirect, url_for, render_template, send_file
+from io import BytesIO
 
 # Create the Flask application instance
 app = Flask(__name__)
@@ -54,6 +57,7 @@ def create_db():
             sr_number TEXT NOT NULL
         )
     ''')
+    c.execute('CREATE TABLE IF NOT EXISTS termed_users (id INTEGER PRIMARY KEY AUTOINCREMENT, user_name TEXT NOT NULL, termed_date TEXT)')
     conn.commit()
     conn.close()
 
@@ -447,6 +451,74 @@ def process_approval(id, action):
     # Redirect back to procurement page after approval/rejection
     return redirect(url_for('procurement'))
 
+
+@app.route('/generate_report', methods=['GET', 'POST'])
+def generate_report():
+    if request.method == 'POST':
+        # Upload the Excel file
+        uploaded_file = request.files['excel_file']
+        if not uploaded_file:
+            flash('No file uploaded', 'danger')
+            return redirect(url_for('generate_report'))
+
+        # Save the uploaded file to a temporary location
+        temp_file_path = 'temp.xlsx'
+        uploaded_file.save(temp_file_path)
+
+        try:
+            # Read the uploaded Excel file
+            df = pd.read_excel(temp_file_path)
+
+            # Extract usernames from the uploaded file (assuming 'username' is a column)
+            if 'username' not in df.columns:
+                flash('Username column not found in the uploaded file', 'danger')
+                return redirect(url_for('generate_report'))
+
+            usernames = df['username'].tolist()
+
+            # Fetch all software assignments from the catalog
+            conn = sqlite3.connect('SAMdashboard.db')
+            c = conn.cursor()
+            c.execute('SELECT * FROM software_catalog')
+            catalog_entries = c.fetchall()
+            conn.close()
+
+            # Filter catalog entries by matching usernames
+            filtered_entries = [entry for entry in catalog_entries if entry[1] in usernames]
+
+            # Prepare data for the report
+            report_data = []
+            for entry in filtered_entries:
+                report_data.append({
+                    'user_name': entry[1],
+                    'software_name': entry[2],
+                    'assigned_date': entry[3],
+                    'sr_number': entry[4]
+                })
+
+            # Create a Pandas DataFrame for the report
+            report_df = pd.DataFrame(report_data)
+
+            # Generate report file in Excel format
+            output = BytesIO()
+            writer = pd.ExcelWriter(output, engine='xlsxwriter')
+            report_df.to_excel(writer, index=False, sheet_name='Report')
+            writer.save()
+            output.seek(0)
+
+            # Serve the file for download
+            return send_file(output, attachment_filename='report.xlsx', as_attachment=True)
+
+        except Exception as e:
+            flash(f'Error generating report: {str(e)}', 'danger')
+            return redirect(url_for('generate_report'))
+
+        finally:
+            # Clean up temporary file
+            if os.path.exists(temp_file_path):
+                os.remove(temp_file_path)
+
+    return render_template('generate_report.html')
 # Run the Flask application
 if __name__ == '__main__':
     app.config['UPLOAD_FOLDER'] = 'uploads'
