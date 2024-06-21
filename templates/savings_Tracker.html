@@ -60,6 +60,7 @@
         .form-container {
             max-width: 600px;
             margin: 0 auto;
+            display: none; /* Initially hidden */
         }
         .form-container label {
             font-weight: bold;
@@ -143,9 +144,9 @@
     </div>
 
     <div class="container">
-        <div class="add-form">
-            <h2>Add New Savings</h2>
-            <form method="POST">
+        <div class="add-form form-container">
+            <h2 class="mb-3">Add New Savings</h2>
+            <form id="addForm" method="POST">
                 <div class="mb-3">
                     <label for="software_id" class="form-label">Software:</label>
                     <select name="software_id" id="software_id" class="form-select" required>
@@ -169,8 +170,8 @@
             </form>
         </div>
 
-        <div class="table-responsive">
-            <h2>Existing Savings</h2>
+        <div class="table-responsive" id="existingSavings">
+            <h2 class="mb-3">Existing Savings</h2>
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -193,5 +194,15 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Slide down the add-form section
+            $(".form-container").slideDown(800); // Adjust the duration as needed
+
+            // Slide down the existingSavings table
+            $("#existingSavings").slideDown(800); // Adjust the duration as needed
+        });
+    </script>
 </body>
 </html>
