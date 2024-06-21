@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centralized Procurement and Approval Workflow</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e0f7fa;
+            margin: 0;
+            padding: 20px;
+        }
+        .top-panel {
+            background-color: #ff6f00; /* Orange color */
+            color: white;
+            padding: 8px 12px; /* Adjusted padding */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top-left-radius: 8px; /* Rounded corners, top left */
+            border-top-right-radius: 8px; /* Rounded corners, top right */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+            margin-bottom: 20px;
+        }
+        .top-panel .panel-title {
+            font-size: 18px; /* Same font size */
+            margin: 0;
+        }
+        .top-panel .menu {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center; /* Align menu items vertically centered */
+        }
+        .top-panel .menu li {
+            margin-left: 20px; /* Adjust spacing between menu items */
+        }
+        .top-panel .menu li:first-child {
+            margin-left: 0; /* Remove margin for the first item */
+        }
+        .top-panel .menu li a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            font-size: 14px; /* Adjusted font size */
+            transition: 0.3s;
+        }
+        .top-panel .menu li a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-container label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .form-container input[type="text"],
+        .form-container input[type="number"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-container input[type="file"] {
+            margin-top: 10px;
+        }
+        .form-container input[type="submit"] {
+            background-color: #ff6f00; /* Orange color */
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            text-decoration: none;
+            font-size: 14px; /* Same font size */
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .form-container input[type="submit"]:hover {
+            background-color: #e65100; /* Darker orange on hover */
+        }
+        .software-entry {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .software-entry p {
+            margin: 5px 0;
+        }
+        .software-entry a {
+            color: #007bff; /* Blue color */
+            text-decoration: none;
+            margin-left: 10px;
+        }
+        .edit-button {
+            background-color: #ff6f00; /* Orange color */
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            text-decoration: none;
+            font-size: 12px; /* Adjusted font size */
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .edit-button:hover {
+            background-color: #e65100; /* Darker orange on hover */
+        }
+        h1 {
+            color: #ffffff; /* White color */
+            text-align: left;
+            margin-top: 0; /* Remove default margin */
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ffffff; /* White underline */
+            padding-bottom: 10px;
+            display: inline-block; /* Ensures border doesn't span full width */
+            font-size: 24px; /* Adjusted font size */
+        }
+    </style>
+</head>
+<body>
+    <div class="top-panel">
+        <h1 class="panel-title">Centralized Procurement and Approval Workflow</h1>
+        <ul class="menu">
+            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('catalog') }}">Catalog</a></li>
+            <li><a href="{{ url_for('reports_dashboard') }}">Reports Dashboard</a></li>
+            <li><a href="{{ url_for('savings_tracker') }}">Savings Tracker</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h1 class="mb-4">Centralized Procurement and Approval Workflow</h1>
+
+        <!-- Software Request Form -->
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title mb-4">Software Procurement Request Form</h5>
+                <form id="procurementForm" method="POST">
+                    <div class="mb-3">
+                        <label for="softwareName" class="form-label">Software Name:</label>
+                        <input type="text" class="form-control" id="softwareName" name="softwareName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="vendor" class="form-label">Vendor:</label>
+                        <input type="text" class="form-control" id="vendor" name="vendor" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="estimatedCost" class="form-label">Estimated Cost ($):</label>
+                        <input type="number" class="form-control" id="estimatedCost" name="estimatedCost" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="purpose" class="form-label">Purpose:</label>
+                        <textarea class="form-control" id="purpose" name="purpose" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Display All Procurement Entries -->
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title mb-4">All Procurement Entries</h5>
+                <ul class="list-group">
+                    {% for entry in entries %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">{{ entry[1] }}</h6>
+                            <small>{{ entry[2] }} | ${{ entry[3] }}</small>
+                            <p class="mb-0">{{ entry[4] }}</p>
+                        </div>
+                        <div>
+                            {% if entry[5] == 'Pending' %}
+                            <span class="badge bg-secondary">{{ entry[5] }}</span>
+                            <a href="{{ url_for('process_approval', id=entry[0], action='approve') }}" class="btn btn-success ms-2">Approve</a>
+                            <a href="{{ url_for('process_approval', id=entry[0], action='reject') }}" class="btn btn-danger ms-2">Reject</a>
+                            {% elif entry[5] == 'Approved' %}
+                            <span class="badge bg-success">{{ entry[5] }}</span>
+                            {% else %}
+                            <span class="badge bg-danger">{{ entry[5] }}</span>
+                            {% endif %}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
