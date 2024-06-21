@@ -7,7 +7,90 @@
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom styles -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+            overflow: hidden; /* Hide overflowing content */
+            position: relative; /* Position for hover effect */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transform and box-shadow animation */
+        }
+        .card:hover {
+            transform: scale(1.03); /* Scale up on hover */
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.2); /* Increase shadow on hover */
+        }
+        .card-body {
+            padding: 40px;
+            transition: background-color 0.3s ease; /* Smooth background-color transition */
+        }
+        .card:hover .card-body {
+            background-color: #fff3e0; /* Light orange background on hover */
+        }
+        .card-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff6f00; /* Orange color */
+            margin-bottom: 30px;
+            text-align: center;
+            transition: color 0.3s ease; /* Smooth color transition */
+        }
+        .card:hover .card-title {
+            color: #e65100; /* Darker orange color on hover */
+        }
+        .form-group label {
+            font-weight: bold;
+            color: #555;
+        }
+        .form-control {
+            border-radius: 5px;
+            border-color: #ccc;
+            box-shadow: none;
+            font-size: 16px;
+        }
+        .btn-primary {
+            background-color: #ff6f00; /* Orange color */
+            border-color: #ff6f00; /* Orange color */
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 12px;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #e65100; /* Darker orange on hover */
+            border-color: #e65100; /* Darker orange on hover */
+        }
+        .btn-block {
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .alert {
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        p {
+            font-size: 14px;
+            color: #777;
+            margin-top: 15px;
+            text-align: center;
+        }
+        p a {
+            color: #ff6f00; /* Orange color */
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        p a:hover {
+            color: #e65100; /* Darker orange on hover */
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body class="bg-light">
     <div class="container">
@@ -15,7 +98,7 @@
             <div class="col-md-6">
                 <div class="card shadow-sm">
                     <div class="card-body">
-                        <h2 class="card-title text-center">Login</h2>
+                        <h2 class="card-title">Login</h2>
                         {% with messages = get_flashed_messages(with_categories=true) %}
                             {% if messages %}
                                 {% for category, message in messages %}
@@ -23,7 +106,6 @@
                                 {% endfor %}
                             {% endif %}
                         {% endwith %}
-
 
                         <form action="{{ url_for('login') }}" method="post">
                             <div class="form-group">
