@@ -8,9 +8,48 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            background-color: #e0f7fa;
             margin: 0;
             padding: 20px;
+        }
+        .top-panel {
+            background-color: #ff6f00; /* Orange color */
+            color: white;
+            padding: 8px 12px; /* Adjusted padding */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top-left-radius: 8px; /* Rounded corners, top left */
+            border-top-right-radius: 8px; /* Rounded corners, top right */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+            margin-bottom: 20px;
+        }
+        .top-panel .panel-title {
+            font-size: 18px; /* Same font size */
+            margin: 0;
+        }
+        .top-panel .menu {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center; /* Align menu items vertically centered */
+        }
+        .top-panel .menu li {
+            margin-left: 20px; /* Adjust spacing between menu items */
+        }
+        .top-panel .menu li:first-child {
+            margin-left: 0; /* Remove margin for the first item */
+        }
+        .top-panel .menu li a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            font-size: 14px; /* Adjusted font size */
+            transition: 0.3s;
+        }
+        .top-panel .menu li a:hover {
+            text-decoration: underline;
         }
         .container {
             background-color: #ffffff;
@@ -40,62 +79,72 @@
             margin-top: 10px;
         }
         .form-container input[type="submit"] {
-            background-color: #007bff;
+            background-color: #ff6f00; /* Orange color */
             color: white;
             border: none;
             padding: 12px 20px;
             text-decoration: none;
-            font-size: 14px;
+            font-size: 14px; /* Same font size */
             cursor: pointer;
             border-radius: 4px;
-            margin-right: 10px; /* Adjusted margin */
+            transition: background-color 0.3s;
         }
         .form-container input[type="submit"]:hover {
-            background-color: #0056b3;
+            background-color: #e65100; /* Darker orange on hover */
         }
-        .savings-tracker-button,
-        .catalog-button {
-            background-color: #007bff;
+        .software-entry {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .software-entry p {
+            margin: 5px 0;
+        }
+        .software-entry a {
+            color: #007bff; /* Blue color */
+            text-decoration: none;
+            margin-left: 10px;
+        }
+        .edit-button {
+            background-color: #ff6f00; /* Orange color */
             color: white;
             border: none;
-            padding: 12px 20px;
+            padding: 6px 12px;
             text-decoration: none;
-            font-size: 14px;
+            font-size: 12px; /* Adjusted font size */
             cursor: pointer;
             border-radius: 4px;
+        }
+        .edit-button:hover {
+            background-color: #e65100; /* Darker orange on hover */
+        }
+        h1 {
+            color: #ffffff; /* White color */
+            text-align: left;
+            margin-top: 0; /* Remove default margin */
             margin-bottom: 20px;
-            display: inline-block;
-        }
-        .savings-tracker-button:hover,
-        .catalog-button:hover {
-            background-color: #0056b3;
-        }
-        .logout-button {
-            background-color: #dc3545; /* Red color for logout button */
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            text-decoration: none;
-            font-size: 14px;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-        .logout-button:hover {
-            background-color: #c82333; /* Darker red on hover */
+            border-bottom: 2px solid #ffffff; /* White underline */
+            padding-bottom: 10px;
+            display: inline-block; /* Ensures border doesn't span full width */
+            font-size: 24px; /* Adjusted font size */
         }
     </style>
 </head>
 <body>
 
-    <h1>Software Asset Management Dashboard</h1>
-    <div class="container">
-        <!-- Adjusted spacing and alignment -->
-        <div style="margin-bottom: 20px;">
-            <a href="{{ url_for('catalog') }}" class="btn btn-primary btn-lg catalog-button">Catalog</a>
-            <a href="{{ url_for('savings_tracker') }}" class="btn btn-primary btn-lg savings-tracker-button">Go to Savings Tracker</a>
-            <a href="{{ url_for('logout') }}" class="btn btn-danger btn-lg float-end logout-button">Logout</a>
-        </div>
+    <div class="top-panel">
+        <h1 class="panel-title">Dashboard</h1>
+        <ul class="menu">
+            <li><a href="{{ url_for('savings_tracker') }}">Savings Tracker</a></li>
+            <li><a href="{{ url_for('catalog') }}">Catalog</a></li>
+            <li><a href="{{ url_for('reports_dashboard') }}">Reports Dashboard</a></li>
+            <li><a href="{{ url_for('procurement') }}">Procurement</a></li> <!-- Added procurement link -->
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </div>
 
+    <div class="container">
         <h2>Add New Software Entry</h2>
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -112,7 +161,7 @@
                 <input type="text" id="software_name" name="software_name" required>
                 <label for="primary_contact">Primary Contact:</label>
                 <input type="text" id="primary_contact" name="primary_contact">
-                <label for="req_number">Requisition Number:</label>
+                <label for="req_number">Requisition Number :</label>
                 <input type="text" id="req_number" name="req_number">
                 <label for="software_spend">Software Spend:</label>
                 <input type="number" id="software_spend" name="software_spend" step="0.01">
@@ -132,11 +181,11 @@
                 <p><strong>Requisition Number:</strong> {{ entry[3] }}</p>
                 <p><strong>Software Spend:</strong> ${{ entry[4] }}</p>
                 {% if entry[5] %}
-                    <p><strong>Contract Document:</strong> <a href="{{ url_for('uploaded_file', filename=entry[5].split('/')[-1]) }}" target="_blank">Download</a></p>
+                    <p><strong>Contract Document:</strong> <a href="{{ url_for('uploaded_file', filename=entry[5].split('/')[-'1']) }}" target="_blank">Download</a></p>
                 {% else %}
                     <p><strong>Contract Document:</strong> Not uploaded</p>
                 {% endif %}
-                <a href="{{ url_for('edit', id=entry[0]) }}" class="btn btn-info">Edit</a>
+                <a href="{{ url_for('edit', id=entry[0]) }}" class="edit-button">Edit</a>
             </div>
         {% endfor %}
     </div>
