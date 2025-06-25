@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Software Asset Management Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
             display: flex;
@@ -12,41 +13,84 @@
             justify-content: center;
             height: 100vh;
             background-color: #f8f9fa;
+            overflow: hidden; /* Prevent scrollbars on small screens */
         }
         .register-container {
             width: 100%;
             max-width: 500px;
-            padding: 15px;
+            padding: 30px;
             border-radius: 10px;
-            background-color: #fff;
+            background-color: #ffffff; /* Light gray background */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: slideIn 1s ease forwards; /* Animation for sliding in */
+            opacity: 0; /* Initially hidden */
+            animation-delay: 0.5s; /* Delay for animation */
+            transition: background-color 0.3s, color 0.3s; /* Smooth transitions */
+            color: #495057; /* Dark gray text */
+        }
+        .register-container:hover {
+            background-color: #ff9800; /* Orange background on hover */
+            color: #ffffff; /* White text on hover */
         }
         .register-title {
-            margin-bottom: 15px;
-            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-size: 2rem;
             font-weight: bold;
             text-align: center;
+        }
+        .form-floating {
+            margin-bottom: 20px;
+        }
+        .form-control {
+            border-radius: 5px;
+            box-shadow: none;
+            font-size: 16px;
+            color: #495057; /* Dark gray text */
+        }
+        .form-control:focus {
+            box-shadow: none;
+            border-color: #ff9800; /* Orange border on focus */
+        }
+        .btn-primary {
+            background-color: #ff9800; /* Orange background */
+            border-color: #ff9800;
+            color: #ffffff; /* White text */
+            transition: background-color 0.3s, border-color 0.3s, transform 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #f57c00; /* Darker orange on hover */
+            border-color: #f57c00;
+            transform: scale(1.05); /* Slightly scale up on hover */
         }
         .register-footer {
             margin-top: 15px;
             text-align: center;
+            font-size: 14px;
+            color: #495057; /* Dark gray text */
         }
-        .form-control:focus {
-            box-shadow: none;
-            border-color: #007bff;
+        .register-footer a {
+            color: #007bff; /* Blue link color */
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
         }
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
+        .register-footer a:hover {
+            color: #0056b3; /* Darker blue on hover */
         }
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #004085;
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="register-container">
+    <div class="register-container" id="registerContainer">
         <h2 class="register-title">Register</h2>
         <form id="registerForm" action="{{ url_for('register') }}" method="post" onsubmit="return validateForm()">
             <div class="form-floating mb-3">
@@ -64,10 +108,15 @@
             <button type="submit" class="btn btn-primary w-100">Register</button>
         </form>
         <div class="register-footer">
-            <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+            <p>Already have an account? <a href="{{ url_for('login') }}" style="color: #007bff;">Login</a></p>
         </div>
     </div>
     <script>
+        $(document).ready(function() {
+            // Slide down effect for the register container
+            $("#registerContainer").slideDown(1000);
+        });
+
         function validateForm() {
             var password = document.getElementById("password").value;
             var confirmPassword = document.getElementById("confirmPassword").value;
